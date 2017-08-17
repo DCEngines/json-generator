@@ -37,7 +37,8 @@ public:
 		VLOG(2) << "got this string " << str << json;
 		std::string ret(str);
 		std::free(str);
-		return std::move(ret);
+		json_decref(json);
+		return ret;
 	}
 	void Seed(int seed) {
 		gen.seed(seed);
@@ -125,6 +126,7 @@ public:
 		auto count = count_->GetOne();
 		assert(json_is_integer(count));
 		auto cntr = json_integer_value(count);
+		json_decref(count);
 		while (cntr--) {
 			json_array_append_new(retjson, item_->GetOne());
 		}
@@ -223,10 +225,15 @@ public:
 };
 
 class OneRandom : public Generator {
-	json_t *the_one_;
+	json_t *the_one_ {nullptr};
 public:
 	OneRandom(Generator::SPtr gen) {
 		the_one_ = gen->GetOne();
+	}
+	~OneRandom() {
+		if (the_one_) {
+			json_decref(the_one_);
+		}
 	}
 	OneRandom(std::string str) {
 		the_one_ = json_string(str.c_str());
