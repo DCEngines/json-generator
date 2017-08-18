@@ -5,7 +5,7 @@
 #include <memory>
 #include <glog/logging.h>
 #include <cassert>
-
+#include <map>
 
 extern std::string get_sentence();
 
@@ -192,7 +192,7 @@ class Distribution : public Generator {
 	double max_;
 	std::uniform_real_distribution<double> rand;
 public:
-	Distribution(std::map<double, Generator::SPtr> distribution) {
+	Distribution(std::vector<std::pair<double, Generator::SPtr>> distribution) {
 		double cummulative = 0;
 		for (auto &itr: distribution) {
 			if (itr.first == 0.0) {
@@ -210,14 +210,14 @@ public:
 	virtual json_t* GetOne() override {
 		double value = rand(gen);
 		Generator::SPtr gen;
-		VLOG(1) << "got rand " << value;
+		VLOG(2) << "got rand " << value;
 		if (value > max_) {
-			VLOG(1) << "above max " << max_ << " value " << value;
+			VLOG(2) << "above max " << max_ << " value " << value;
 			gen = default_gen_;
 		} else {
 			auto itr = distribution_.upper_bound(value);
 			assert(itr != distribution_.end());
-			VLOG(1) << "got map value " << itr->first;
+			VLOG(2) << "got map value " << itr->first;
 			gen = itr->second;
 		}
 		return gen->GetOne();

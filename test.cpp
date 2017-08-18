@@ -2,6 +2,8 @@
 #include <glog/logging.h>
 #include "json_gen.h"
 
+//use command line flags "-v 2 -alsologtostderr=true" to enable vlog output
+
 TEST(generator, basic)
 {
 	// first we create the root object
@@ -45,7 +47,7 @@ TEST(generator, basic)
 	// probability. The sum of specified probabilities must be less
 	// than 1.0 For the remainder of the time the default function is
 	// called. The default is specified with a probability of zero(0).
-	std::map<double, Generator::SPtr> distribution = {
+	std::vector<std::pair<double, Generator::SPtr>> distribution = {
 		{0.1, std::make_shared<OneRandom>("heads")}, // occurs with probability of 0.1
 		{0.11, std::make_shared<OneRandom>("tails")}, // occurs with probability 0.11
 		// by specifying a NullJson you can create an optional field
@@ -64,7 +66,7 @@ TEST(generator, basic)
 
 	nest_obj->addChild("Comment", std::make_shared<ProperSentence>());
 
-	std::map<double, Generator::SPtr> dist = {
+	std::vector<std::pair<double, Generator::SPtr>> dist = {
 		{0.60, std::make_shared<OneRandom>("India")},
 		{0, word},
 	};
